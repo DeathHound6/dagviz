@@ -9,7 +9,8 @@ const fs = require('fs');
 
 // Set up memoryjs vars
 let processObject;
-const memoryBase = 0x20000000
+let worldId = 0;
+const memoryBase = 0x20000000;
 
 // Possible task states
 const UNAVAILABLE = 0;
@@ -56,10 +57,14 @@ let nodesDisplay = 'name';
 // Declare DAG and tasks dict
 let dag;
 let tasks = {};
+for (const num of Object.values(BUILDS)) {
+    if (num == -1)
+        continue;
+    tasks[num] = {};
+}
 
 // Define graph classes
 class Node {
-
     static oId = [0x18, 0x18];
     static oState = [0x54, 0x44];
     static oNumChildren = [0xa0, 0x90];
@@ -84,19 +89,29 @@ class Node {
     get state() {
         return readMemory(this.address + Node.oState[GAME], memoryjs.UINT32);
     }
-    s
+    get stateName() {
+        const state = this.state;
+        if (state == 0)
+            return "Unavailable";
+        if (state == 1)
+            return "Available";
+        if (state == 2)
+            return "Complete";
+        if (state == 3)
+            return "Final";
+        return "Unknown";
+    }
 
     set state(val) {
         writeMemory(this.address + Node.oState[GAME], val, memoryjs.UINT32);
     }
 
     get children() {
-        let children = []
+        let children = [];
         let numChildren = readMemory(this.address + Node.oNumChildren[GAME], memoryjs.UINT32);
         let childrenArray = readMemory(this.address + Node.oChildrenArray[GAME], memoryjs.UINT32); // retail: a4, proto: 98
-        for (let i = 0; i < numChildren; i++) {
+        for (let i = 0; i < numChildren; i++)
             children.push(readMemory(childrenArray + i*4, memoryjs.UINT32));
-        }
         return children;
     }
 
@@ -123,24 +138,24 @@ class Node {
 
     // get the tasks's name based on its ID
     get name() {
-        if ((BUILD == BUILDS.sly2ntsc) && (this.id in tasks[BUILDS.sly2ntsc.retail])) {
-            return tasks[BUILDS.sly2ntsc.retail][this.id].name;
+        if ((BUILD == BUILDS.sly2ntsc) && (String(this.id) in tasks[BUILD][String(worldId)])) {
+            return tasks[BUILD][String(worldId)][String(this.id)].name;
         } else {
             return '0x' + hex(this.address);
         }
     }
 
     get description() {
-        if ((BUILD == BUILDS.sly2ntsc) && (this.id in tasks[BUILDS.sly2ntsc.retail])) {
-            return tasks[BUILDS.sly2ntsc.retail][this.id].desc;
+        if ((BUILD == BUILDS.sly2ntsc) && (String(this.id) in tasks[BUILD][String(worldId)])) {
+            return tasks[BUILD][String(worldId)][String(this.id)].desc;
         } else {
             return `Node at address 0x${this.address}`;
         }
     }
 
     get type() {
-        if ((BUILD == BUILDS.sly2ntsc) && (this.id in tasks[BUILDS.sly2ntsc.retail])) {
-            return tasks[BUILDS.sly2ntsc.retail][this.id].type;
+        if ((BUILD == BUILDS.sly2ntsc) && (String(this.id) in tasks[BUILD][String(worldId)])) {
+            return tasks[BUILD][String(worldId)][String(this.id)].type;
         } else {
             return 'Task';
         }
@@ -156,7 +171,7 @@ class Node {
     
         let label;
         if (nodesDisplay == 'name') {
-            label = this.name
+            label = this.name;
         } else if (nodesDisplay == 'id-hex') {
             label = '0x' + hex(this.id);
         } else if (nodesDisplay == 'address') {
@@ -269,16 +284,15 @@ class Node {
     // generate the dot language text for the node
     dotNode() {
         let dots = `"${hex(this.address)}" ${this.style}`;
-        return dots
+        return dots;
     }
 
     // generate the dot language text for the node's edges
     dotEdges() {
         let dots = [];
         let edges = this.edges;
-        for (const e of edges) {
+        for (const e of edges)
             dots.push(`"${hex(this.address)}" -> "${hex(e)}"`);
-        }
         return dots.join('\n');
     }
 }
@@ -299,20 +313,21 @@ class Graph {
     populateGraph(head) {
         this.clear()
         this.head = head;
-
-        var visited  = []
+        var visited = [];
 
         try {
             this.populateChildren(head, visited)
         } catch (e) {
-            console.log("Error populating dag");
+            console.error("Error populating dag");
+            console.error(e);
         }
     }
 
     // recursively populate the dag with a node and it's children
     populateChildren(nodeAddress, visited) {
         // add node to visited array so we don't check it twice
-        if (visited.indexOf(nodeAddress) > 0) return;
+        if (visited.indexOf(nodeAddress) > 0)
+            return;
         visited.push(nodeAddress);
 
         if (visited.length > 500)
@@ -322,7 +337,8 @@ class Graph {
 
         // add node to cluster in dag based on job
         let job = node.job
-        if (!(job in this.clusters)) this.clusters[job] = new Subgraph(job);
+        if (!(job in this.clusters))
+            this.clusters[job] = new Subgraph(job);
         this.clusters[node.job].nodes.push(node);
 
         // add node edges to task (we only do this once because we assume they won't change)
@@ -340,8 +356,10 @@ class Graph {
     reset() {
         for (let cluster of Object.values(this.clusters)) {
             for (let node of cluster.nodes) {
-                if (node.numParents == 0) node.state = 1;
-                else node.state = 0;
+                if (node.numParents == 0)
+                    node.state = 1;
+                else
+                    node.state = 0;
             }
         }
     }
@@ -358,8 +376,10 @@ class Graph {
 
         // generate dot strings for each cluster and append them to the graph
         for (const [id, cluster] of Object.entries(this.clusters)) {
-            if (id == 0) dots.push(cluster.dot(false));
-            else dots.push(cluster.dot());
+            if (id == 0)
+                dots.push(cluster.dot(false));
+            else
+                dots.push(cluster.dot());
         }
 
         // append pre-populated edge strings to the graph
@@ -428,12 +448,11 @@ function detectGame() {
     }
 
     // detect which game is running and set BUILD
-    var sly2Pid = readMemory(0x15b90, memoryjs.STRING);
-    var sly3Pid = readMemory(0x15390, memoryjs.STRING);
-
     var buildString = '';
+    // /console.log(readMemory(0x15395, memoryjs.STRING));
+    // readMemory(0x15b90, memoryjs.STRING)
     // Sly 2 - Retail
-    if (buildString = readMemory(0x15b90, memoryjs.STRING), buildString.indexOf('973.16') > -1) {
+    if (buildString = readMemory(0x15395, memoryjs.STRING), buildString.indexOf('973.16') > -1) {
         GAME = 0;
         BUILD = BUILDS.sly2ntsc;
     }
@@ -480,15 +499,16 @@ ipc.on('export-dot', function() {
           return
         }
         console.log("Exported DAG to export.dot");
-      })
-})
+    });
+});
 
 ipc.on('set-settings', function(event, store) {
     autoDetectBuild = store['auto-detect-build'];
-    if (!autoDetectBuild) BUILD = BUILDS[store['build']];
+    if (!autoDetectBuild)
+        BUILD = BUILDS[store['build']];
     nodesDisplay = store['nodes-display'];
     var baseAddress = store['base-address'];
-})
+});
 
 // Create the browser window
 function createWindow() {
@@ -511,7 +531,7 @@ function createWindow() {
     // Exit app when window closed
     win.on('closed', function() {
         process.exit();
-    })
+    });
 
     // Load the app index.html
     let htmlPath = path.join(__dirname, 'index.html');
@@ -532,15 +552,11 @@ app.whenReady().then(() => {
     // Handle minimize and maximize events
     ipc.on('minimize', () => {
         win.minimize();
-    })
+    });
     ipc.on('maximize', () => {
         win.maximize();
-    })
+    });
 
-    // Load task names/descriptions from JSON file
-    let jsonPath = path.join(__dirname, 'tasks-sly2.json')
-    let rawdata = fs.readFileSync(jsonPath);
-    tasks[BUILDS.sly2ntsc.retail] = JSON.parse(rawdata);
 
     // Init empty Graph
     dag = new Graph();
@@ -549,58 +565,63 @@ app.whenReady().then(() => {
     setInterval(() => {
         // Try to attach to PCSX2
         reattach();
-        if (processObject == undefined) {
+        if (processObject == undefined)
             // Handle PCSX2 not detected
-            win.webContents.send('no-game', 'PCSX2 not detected.');
-        } else {
-            // Try to detect currently running game
-            if (autoDetectBuild) {
-                detectGame();
-                win.webContents.send('build', BUILD);
+            return win.webContents.send('no-game', 'PCSX2 not detected.');
+        // Try to detect currently running game
+        if (autoDetectBuild) {
+            detectGame();
+            win.webContents.send('build', BUILD);
+        }
+
+        if (BUILD == -1)
+            // Handle no game detected
+            return win.webContents.send('no-game', 'Game not detected.');
+
+        // Load task names/descriptions from JSON file
+        tasks[BUILD] = JSON.parse(fs.readFileSync(`${__dirname}/tasks-${BUILD}.json`));
+
+        // Read World ID from memory
+        worldId = readMemory(worldIdAdrs[BUILD], memoryjs.UINT32);
+
+        // Convert Sly 3 world IDs to episode IDs
+        if (BUILD == BUILDS.sly3ntsc) {
+            if (worldId == 2)
+                worldId = 'N/A'; // Sly 3 Hazard Room
+            else if (worldId == 1)
+                worldId = 0; // Sly 3 Prologue
+            else
+                worldId -= 2; // all other Sly 3 worlds
+        }
+
+        // Get root node of current dag
+        let rootNode = 0x0;
+        if (BUILD == BUILDS.sly2ntsc && worldId == 3)
+            rootNode = readMemory(readMemory(0x3e0b04, memoryjs.UINT32) + 0x20, memoryjs.UINT32); // manually set root for Sly 2 ep3
+        else
+            rootNode = readMemory(headAdrs[BUILD], memoryjs.UINT32); // automatically get it for the rest of them
+
+        // Check and update the dag, only if the root is not null
+        if (rootNode != 0x0) {
+            // Check if the game is loading
+            let isLoading = false;
+            if (BUILD == BUILDS.sly2ntsc && (readMemory(0x3D4830, memoryjs.UINT32) == 0x1))
+                isLoading = true;
+            else if (BUILD == BUILDS.sly3ntsc && (readMemory(0x467B00, memoryjs.UINT32) == 0x1))
+                isLoading = true
+            else
+                isLoading = false;
+
+            // if the dag head is out of date, wait until 0.4 sec after level load to repopulate
+            if ((rootNode != dag.head) && !(isLoading)) {
+                setTimeout(() => {
+                    dag.populateGraph(rootNode);
+                }, 400);
             }
 
-            if (BUILD == -1) {
-                // Handle no game detected
-                win.webContents.send('no-game', 'Game not detected.');
-            } else {
-                // Set DAG head node
-                var headAddr = headAdrs[BUILD];
-
-                // Read World ID from memory
-                var worldAddr = worldIdAdrs[BUILD]
-                var worldId = readMemory(worldAddr, memoryjs.UINT32);
-
-                // Convert Sly 3 world IDs to episode IDs
-                if (BUILD == BUILDS.sly3ntsc) {
-                    if (worldId == 2) worldId = 'N/A'; // Sly 3 Hazard Room
-                    else if (worldId == 1) worldId = 0; // Sly 3 Prologue
-                    else worldId -= 2; // all other Sly 3 worlds
-                }
-
-                // Get root node of current dag
-                if (BUILD == BUILDS.sly2ntsc && worldId == 3) rootNode = readMemory(readMemory(0x3e0b04, memoryjs.UINT32) + 0x20, memoryjs.UINT32); // manually set root for Sly 2 ep3
-                else var rootNode = readMemory(headAddr, memoryjs.UINT32); // automatically get it for the rest of them
-
-                // Check and update the dag, only if the root is not null
-                if (rootNode != 0x000000) {
-                    // Check if the game is loading
-                    let isLoading = false;
-                    if (BUILD == BUILDS.sly2ntsc && (readMemory(0x3D4830, memoryjs.UINT32) == 0x1)) isLoading = true;
-                    else if (BUILD == BUILDS.sly3ntsc && (readMemory(0x467B00, memoryjs.UINT32) == 0x1)) isLoading = true
-                    else isLoading = false;
-
-                    // if the dag head is out of date, wait until 0.4 sec after level load to repopulate
-                    if ((rootNode != dag.head) && !(isLoading)) {
-                        setTimeout(() => {
-                            dag.populateGraph(rootNode);
-                        }, 400);
-                    }
-
-                    // send the dot text to the window
-                    win.webContents.send('dot-text', dag.dot());
-                    win.webContents.send('world-id', worldId);
-                }
-            }
+            // send the dot text to the window
+            win.webContents.send('dot-text', dag.dot());
+            win.webContents.send('world-id', worldId);
         }
     }, 500);
-})
+});
