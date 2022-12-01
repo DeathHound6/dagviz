@@ -1,4 +1,9 @@
 {
+    "": {
+        "name": "",
+        "desc": "press room",
+        "type": "Task"
+    },
     "0": {
         "1664": {
             "name": "",
@@ -17,8 +22,68 @@
         },
         "1583": {
             "name": "",
-            "desc": "Get up to Bentley",
+            "desc": "Wait for Bentley to disable security",
             "type": "Task"
+        },
+        "1679": {
+            "name": "",
+            "desc": "Bentley says \"Jump and hit the circle button to run on ropes\"",
+            "type": "Cutscene"
+        },
+        "1680": {
+            "name": "",
+            "desc": "Murray breaks the Clockwerk Parts window",
+            "type": "Cutscene"
+        },
+        "1684": {
+            "name": "",
+            "desc": "Stolen Clockwerk Parts cutscene",
+            "type": "Cutscene"
+        },
+        "1689": {
+            "name": "",
+            "desc": "Carmelita says \"Come back here ringtail\"",
+            "type": "Cutscene"
+        },
+        "1696": {
+            "name": "",
+            "desc": "Run away from Carmelita",
+            "type": "Task"
+        },
+        "1699": {
+            "name": "",
+            "desc": "Sly and Carmelita jump through the windows",
+            "type": "Cutscene"
+        },
+        "1703": {
+            "name": "",
+            "desc": "Spiral jump onto rope 1",
+            "type": "Task"
+        },
+        "1705": {
+            "name": "",
+            "desc": "Spiral jump onto rope 2",
+            "type": "Task"
+        },
+        "1707": {
+            "name": "",
+            "desc": "Spiral jump onto rope 3",
+            "type": "Task"
+        },
+        "1709": {
+            "name": "",
+            "desc": "Slide down rope 4 - land on the ground",
+            "type": "Task"
+        },
+        "1711": {
+            "name": "",
+            "desc": "Get into the Cooper Van",
+            "type": "Task"
+        },
+        "1713": {
+            "name": "",
+            "desc": "Complete Tutorial Episode",
+            "type": "Cutscene"
         }
     },
     "1": {
@@ -518,11 +583,7 @@
             "type": "Task"
         }
     },
-    "": {
-        "name": "",
-        "desc": "press room",
-        "type": "Task"
-    },
+    "2": {},
     "3": {
         "2168": {
             "name": "t3_intro",
@@ -1092,58 +1153,58 @@
         },
         "3392": {
             "name": "",
-            "desc": "",
-            "type": ""
+            "desc": "Job Trigger for \"Murray/Sly Tag Team\"",
+            "type": "Job Start"
         },
         "3393": {
             "name": "",
-            "desc": "",
-            "type": ""
+            "desc": "Destroy the second alarm at the back-right of the blimp",
+            "type": "Task"
         },
         "3394": {
             "name": "",
-            "desc": "",
-            "type": ""
+            "desc": "Destroy the second alarm at the back-left of the blimp",
+            "type": "Task"
         },
         "3395": {
             "name": "",
-            "desc": "",
-            "type": ""
+            "desc": "Destroy the alarm at the front of the blimp",
+            "type": "Task"
         },
         "3396": {
             "name": "",
-            "desc": "",
-            "type": ""
+            "desc": "Destroy the first alarm at the back-right of the blimp",
+            "type": "Task"
         },
         "3397": {
             "name": "",
-            "desc": "",
-            "type": ""
+            "desc": "Destroy the first alarm at the back-left of the blimp",
+            "type": "Task"
         },
         "3398": {
             "name": "",
-            "desc": "",
-            "type": ""
+            "desc": "Open the engine door",
+            "type": "Task"
         },
         "3399": {
             "name": "",
-            "desc": "",
-            "type": ""
+            "desc": "Murray says \"Your turn buddy\"",
+            "type": "Task"
         },
         "3401": {
             "name": "",
-            "desc": "",
-            "type": ""
+            "desc": "Checkpoint (complete floor 1)",
+            "type": "Task"
         },
         "3402": {
             "name": "",
-            "desc": "",
-            "type": ""
+            "desc": "Flip the engine switch",
+            "type": "Task"
         },
         "3403": {
             "name": "",
-            "desc": "",
-            "type": ""
+            "desc": "Complete \"Murray/Sly Tag Team\"",
+            "type": "Job Complete"
         },
         "3408": {
             "name": "",
