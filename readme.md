@@ -2,7 +2,7 @@
 
 DAGviz is a game-state viewer/editor for [Sly 2](https://en.wikipedia.org/wiki/Sly_2:_Band_of_Thieves) and [Sly 3](https://en.wikipedia.org/wiki/Sly_3:_Honor_Among_Thieves) using memory.js and graphviz. Downloads are available on the [Releases](https://github.com/theonlyzac/dagviz/releases/) tab.
 
-<img src="img/thumb.png" alt="A screenshot of DAGviz." align="right" style="float: right; margin: 10px; width: 400px">
+<img src="src/public/img/thumb.png" alt="A screenshot of DAGviz." align="right" style="float: right; margin: 10px; width: 400px">
 
 ## Features
 
