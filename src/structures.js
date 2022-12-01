@@ -7,7 +7,7 @@ class Memory {
     /**
      * @param {String} address
      * @param {String} type
-     * @returns 
+     * @returns {Number|String}
      */
     static read(address, type) {
         return readMemory(processObject().handle, memoryBase + address, type);
@@ -16,10 +16,9 @@ class Memory {
      * @param {String} address
      * @param {String|Number} value
      * @param {String} type
-     * @returns 
      */
     static write(address, value, type) {
-        return writeMemory(processObject().handle, memoryBase + address, value, type);
+        writeMemory(processObject().handle, memoryBase + address, value, type);
     }
 }
 
@@ -77,6 +76,9 @@ class Node {
         Memory.write(this.address + Node.oState[GAME()], val, UINT32);
     }
 
+    /**
+     * @returns {Number[]}
+     */
     get children() {
         let children = [];
         let numChildren = Memory.read(this.address + Node.oNumChildren[GAME()], UINT32);
@@ -86,6 +88,9 @@ class Node {
         return children;
     }
 
+    /**
+     * @returns {Number[]}
+     */
     get parents() {
         let parents = [];
         let numParents = Memory.read(this.address + Node.oNumParents[GAME()], UINT32);
@@ -95,18 +100,27 @@ class Node {
         return parents;
     }
 
-    // get the job pointer for the task
+    /**
+     * get the job pointer for the task
+     * @returns {Number}
+     */
     get job() {
         return Memory.read(this.address + Node.oJob[GAME()], UINT32); //retail
         //return readMemory(this.address + 0x74, memoryjs.UINT32); //proto
     }
 
-    // get the checkpoint for this node
+    /**
+     * get the checkpoint for this node
+     * @returns {Number}
+     */
     get checkpoint() {
         return Memory.read(this.address + Node.oCheckpoint[GAME()], UINT32);
     }
 
-    // get the tasks's name based on its ID
+    /**
+     * get the tasks's name based on its ID
+     * @returns {String}
+     */
     get name() {
         if ((BUILD() == BUILDS.sly2ntsc) && (String(this.id) in tasks()[BUILD()][String(worldId())]))
             return tasks()[BUILD()][String(worldId())][String(this.id)].name;
@@ -114,6 +128,9 @@ class Node {
             return `0x${this.address.toString(16)}`;
     }
 
+    /**
+     * @returns {String}
+     */
     get description() {
         if ((BUILD() == BUILDS.sly2ntsc) && (String(this.id) in tasks()[BUILD()][String(worldId())]))
             return tasks()[BUILD()][String(worldId())][String(this.id)].desc;
@@ -121,6 +138,9 @@ class Node {
             return `Node at address 0x${this.address}`;
     }
 
+    /**
+     * @returns {String}
+     */
     get type() {
         if ((BUILD() == BUILDS.sly2ntsc) && (String(this.id) in tasks()[BUILD()][String(worldId())]))
             return tasks()[BUILD()][String(worldId())][String(this.id)].type;
@@ -269,8 +289,17 @@ class Node {
 
 class Graph {
     constructor() {
+        /**
+         * @type {Number?}
+         */
         this.head;
+        /**
+         * @type {Object<number, Subgraph>}
+         */
         this.clusters = {};
+        /**
+         * @type {String}
+         */
         this.edgeText = '';
     }
 
@@ -280,10 +309,13 @@ class Graph {
         this.edgeText = '';
     }
 
+    /**
+     * @param {Number} head
+     */
     populateGraph(head) {
-        this.clear()
+        this.clear();
         this.head = head;
-        var visited = [];
+        const visited = [];
         try {
             this.populateChildren(head, visited);
         } catch (e) {
@@ -292,7 +324,11 @@ class Graph {
         }
     }
 
-    // recursively populate the dag with a node and it's children
+    /**
+     * recursively populate the dag with a node and it's children
+     * @param {Number} nodeAddress
+     * @param {Number[]} visited
+     */
     populateChildren(nodeAddress, visited) {
         // add node to visited array so we don't check it twice
         if (visited.indexOf(nodeAddress) > 0)
@@ -308,16 +344,15 @@ class Graph {
         const job = node.job;
         if (!(job in this.clusters))
             this.clusters[job] = new Subgraph(job);
-        this.clusters[node.job].nodes.push(node);
+        this.clusters[job].nodes.push(node);
 
         // add node edges to task (we only do this once because we assume they won't change)
         this.edgeText += `\t${node.dotEdges()}\n`;
 
         // recursively add it's children to the graph
         for (const edge of node.edges) {
-            if (!(this.edge in visited)) {
+            if (!(this.edge in visited))
                 this.populateChildren(edge, visited);
-            }
         }
     }
 
@@ -366,6 +401,9 @@ class Subgraph {
          * @type {Number}
          */
         this.id = id;
+        /**
+         * @type {Node[]}
+         */
         this.nodes = [];
     }
 
