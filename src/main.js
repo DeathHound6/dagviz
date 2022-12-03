@@ -15,9 +15,9 @@ let processObject = undefined;
 let worldId = 0;
 
 // Application Variables
-const appSettings = JSON.parse(existsSync("config.json") ? readFileSync("config.json").toString(): '{}');
-let autoDetectBuild = appSettings.autoDetectBuild ?? true;
-let nodesDisplay = appSettings.nodesDisplay ?? 'name';
+const appSettings = JSON.parse(existsSync(`${__dirname}/config.json`) ? readFileSync(`${__dirname}/config.json`).toString(): '{}');
+let autoDetectBuild = appSettings["auto-detect-build"] || true;
+let nodesDisplay = appSettings["nodes-display"] || 'name';
 
 module.exports = {
     GAME: function() { return GAME; },
@@ -36,15 +36,15 @@ module.exports = {
 
 // define requires to local files later to prevent circular imports
 const { BUILDS, WorldAddresses, HeadAddresses } = require("./constants");
-const { Graph, Memory } = require("./structures");
+const { Graph, Memory, Node } = require("./structures");
 
 // Declare DAG and tasks dict
 const dag = new Graph();
-for (const num of Object.values(BUILDS)) {
-    if (num == -1)
-        continue;
-    tasks[num] = {};
-}
+// for (const num of Object.values(BUILDS)) {
+//     if (num == -1)
+//         continue;
+//     tasks[num] = {};
+// }
 
 function reattach() {
     try {
@@ -95,8 +95,7 @@ function detectGame() {
 
 // Handle events from renderer.js
 ipc.on('force-state', function(event, store) {
-    let node = new Node(parseInt(store.node, 16));
-    node.forceState(store.state);
+    new Node(parseInt(store.node, 16)).forceState(store.state);
 });
 ipc.on('reset-dag', function() {
     dag.reset();
@@ -105,8 +104,7 @@ ipc.on('refresh-dag', function() {
     dag.populateGraph(dag.head);
 });
 ipc.on('export-dot', function() {
-    const dot = dag.dot();
-    writeFile('export.dot', dot, err => {
+    writeFile('export.dot', dag.dot(), err => {
         if (err)
             return console.error(err);
         console.log("Exported DAG to export.dot");
@@ -117,7 +115,11 @@ ipc.on('set-settings', function(event, store) {
     if (!autoDetectBuild)
         BUILD = BUILDS[store['build']];
     nodesDisplay = store['nodes-display'];
-    var baseAddress = store['base-address'];
+    //var baseAddress = store['base-address'];
+    writeFile(`${__dirname}/config.json`, JSON.stringify({ "nodes-display": nodesDisplay, "auto-detect-build": autoDetectBuild, build: store["build"] }), (err) => {
+        if (err)
+            return console.error(err);
+    });
 });
 
 function createWindow() {
@@ -167,25 +169,27 @@ app.whenReady().then(() => {
     ipc.on('maximize', () => {
         win.maximize();
     });
+    setTimeout(()=>win.webContents.send("get-settings", appSettings), 300);
 
     // Try to update graph and send dot text to window every 500ms
     setInterval(() => {
         // Try to attach to PCSX2
-        reattach();
-        if (processObject == undefined)
+        if (reattach(), !processObject)
             // Handle PCSX2 not detected
             return win.webContents.send('no-game', 'PCSX2 not detected.');
+
         // Try to detect currently running game
         if (autoDetectBuild) {
             detectGame();
             win.webContents.send('build', BUILD);
         }
 
+        // Handle no game detected
         if (BUILD == -1)
-            // Handle no game detected
             return win.webContents.send('no-game', 'Game not detected.');
 
-        tasks[BUILD] = JSON.parse(readFileSync(`${__dirname}/tasks-${BUILD}.json`));
+        if (!tasks[BUILD])
+            tasks[BUILD] = JSON.parse(readFileSync(`${__dirname}/tasks-${BUILD}.json`));
 
         worldId = Memory.read(WorldAddresses[BUILD], memoryjs.UINT32);
 
