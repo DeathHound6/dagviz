@@ -26,8 +26,16 @@ const WorldAddresses = Object.freeze([
     0x45AFB0 // 5
 ]);
 
+const States = Object.freeze({
+    UNAVAILABLE: 0,
+    AVAILABLE: 1,
+    COMPLETE: 2,
+    FINAL: 3
+});
+
 module.exports = {
     BUILDS,
     HeadAddresses,
-    WorldAddresses
+    WorldAddresses,
+    States
 }
