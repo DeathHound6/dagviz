@@ -1,7 +1,7 @@
 const { readMemory, writeMemory, UINT32 } = require("memoryjs");
 
 const { memoryBase, processObject, GAME, BUILD, worldId, settings, tasks } = require("./main");
-const { BUILDS } = require("./constants");
+const { BUILDS, States } = require("./constants");
 
 class Memory {
     /**
@@ -60,16 +60,8 @@ class Node {
         return Memory.read(this.address + Node.oState[GAME()], UINT32);
     }
     get stateName() {
-        const state = this.state;
-        if (state == 0)
-            return "Unavailable";
-        if (state == 1)
-            return "Available";
-        if (state == 2)
-            return "Complete";
-        if (state == 3)
-            return "Final";
-        return "Unknown";
+        const stateName = Object.entries(States).find((k,v) => v == this.state)[0];
+        return stateName.toLowerCase().replace(stateName.charAt(0), stateName.charAt(0).toUpperCase());
     }
 
     set state(val) {
@@ -202,30 +194,30 @@ class Node {
         for (const parent of this.parents) {
             const p = new Node(parent);
 
-            if (newState == UNAVAILABLE) {
+            if (newState == States.UNAVAILABLE) {
                 // if target state is unavailable
-                if (p.state in [UNAVAILABLE, AVAILABLE])
+                if (p.state in [States.UNAVAILABLE, States.AVAILABLE])
                     // if parent state is unvailable or available
                     // no change to parent is needed
                     p.forceState(p.state, visited);
                 else
                     // if parent state is complete or final
                     // parent should be available
-                    p.forceState(AVAILABLE, visited);
+                    p.forceState(States.AVAILABLE, visited);
             } else {
                 // if target state is available, complete, or final
                 if (p.job == 0)
                     // if parent is not in a job, it should be final
-                    p.forceState(FINAL, visited);
+                    p.forceState(States.FINAL, visited);
                 else if (p.job != this.job)
                     // if parent is in a job, and it's not the same as this nodes' job
                     // it must be the last node in a job so, it must be final
-                    p.forceState(FINAL, visited);
+                    p.forceState(States.FINAL, visited);
                 else {
                     // if parent is in a job, and it is the same as this node's job
-                    if (newState == AVAILABLE)
+                    if (newState == States.AVAILABLE)
                         // if target state is available, parent must be complete
-                        p.forceState(COMPLETE, visited)
+                        p.forceState(States.COMPLETE, visited)
                     else
                         // if the target state is complete or final
                         // parent must be complete or final, but either way
@@ -242,29 +234,29 @@ class Node {
         for (const child of this.children) {
             const c = new Node(child);
 
-            if (newState in [UNAVAILABLE, AVAILABLE])
+            if (newState in [States.UNAVAILABLE, States.AVAILABLE])
                 // if target state is unavailable or available,
                 // child must be unavailable
-                c.forceState(UNAVAILABLE, visited);
-            else if (newState == COMPLETE) {
+                c.forceState(States.UNAVAILABLE, visited);
+            else if (newState == States.COMPLETE) {
                 // if target state is complete...
                 for (const child2 of c.children) {
-                    if (child2.state in [AVAILABLE, COMPLETE])
+                    if (child2.state in [States.AVAILABLE, States.COMPLETE])
                         // if child2 has a child that is available or complete,
                         // child must be complete
-                        c.forceState(COMPLETE, visited);
-                    else if (child2.state == UNAVAILABLE)
-                        c.forceState(UNAVAILABLE);
+                        c.forceState(States.COMPLETE, visited);
+                    else if (child2.state == States.UNAVAILABLE)
+                        c.forceState(States.UNAVAILABLE);
                     else
                         // otherwise, it must be available
-                        c.forceState(AVAILABLE, visited);
+                        c.forceState(States.AVAILABLE, visited);
                 }
             } else {
                 // if target state is final...
                 if (c.job == this.job)
                     // if child node is in same job as this node,
                     // child must be final
-                    c.forceState(FINAL, visited);
+                    c.forceState(States.FINAL, visited);
                 else
                     // otherwise, it must be available
                     c.forceState(AVAILABLE, visited);
