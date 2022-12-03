@@ -6,82 +6,82 @@
     },
     "0": {
         "1664": {
-            "name": "",
+            "name": "t0_rooftop_prerunup",
             "desc": "Game bootup cutscene",
             "type": "Cutscene"
         },
         "1668": {
-            "name": "",
+            "name": "t0_wire_work",
             "desc": "\"Sly Cooper. The Thief\" cinematic",
             "type": "Cutscene"
         },
         "1582": {
-            "name": "",
+            "name": "t0_rooftop_start?",
             "desc": "Main Menu selection",
             "type": "Job Start"
         },
         "1583": {
-            "name": "",
+            "name": "t0_security_shutdown",
             "desc": "Wait for Bentley to disable security",
             "type": "Task"
         },
         "1679": {
-            "name": "",
+            "name": "t0_rooftop_runup",
             "desc": "Bentley says \"Jump and hit the circle button to run on ropes\"",
             "type": "Cutscene"
         },
         "1680": {
-            "name": "",
+            "name": "t0_murray_help",
             "desc": "Murray breaks the Clockwerk Parts window",
             "type": "Cutscene"
         },
         "1684": {
-            "name": "",
+            "name": "t0_clockwerk_room",
             "desc": "Stolen Clockwerk Parts cutscene",
             "type": "Cutscene"
         },
         "1689": {
-            "name": "",
+            "name": "t0_chase_hallway_start",
             "desc": "Carmelita says \"Come back here ringtail\"",
             "type": "Cutscene"
         },
         "1696": {
-            "name": "",
+            "name": "t0_chase_hallway_complete",
             "desc": "Run away from Carmelita",
             "type": "Task"
         },
         "1699": {
-            "name": "",
+            "name": "t0_attract_mode?",
             "desc": "Sly and Carmelita jump through the windows",
             "type": "Cutscene"
         },
         "1703": {
-            "name": "",
+            "name": "t0_cop_car_chase2",
             "desc": "Spiral jump onto rope 1",
             "type": "Task"
         },
         "1705": {
-            "name": "",
+            "name": "t0_cop_car_chase3",
             "desc": "Spiral jump onto rope 2",
             "type": "Task"
         },
         "1707": {
-            "name": "",
+            "name": "t0_cop_car_chase4",
             "desc": "Spiral jump onto rope 3",
             "type": "Task"
         },
         "1709": {
-            "name": "",
+            "name": "t0_van_rescue_attempt",
             "desc": "Slide down rope 4 - land on the ground",
             "type": "Task"
         },
         "1711": {
-            "name": "",
+            "name": "t0_van_escape",
             "desc": "Get into the Cooper Van",
             "type": "Task"
         },
         "1713": {
-            "name": "",
+            "name": "t0_complete",
             "desc": "Complete Tutorial Episode",
             "type": "Cutscene"
         }
@@ -583,7 +583,98 @@
             "type": "Task"
         }
     },
-    "2": {},
+    "2": {
+        "1978": {
+            "name": "t2_intro",
+            "desc": "\"A Starry Eyed Encounter\" introduction cutscene",
+            "type": "Task"
+        },
+        "1980": {
+            "name": "t2_teach_spires",
+            "desc": "Listen to Bentley tell you something you knew",
+            "type": "Task"
+        },
+        "1984": {
+            "name": "t2_recon_intro",
+            "desc": "Job Trigger for \"Recon the Ballroom\"",
+            "type": "Job Start"
+        },
+        "1985": {
+            "name": "t2_recon_enter_ballroom",
+            "desc": "Enter the ballroom",
+            "type": "Task"
+        },
+        "1986": {
+            "name": "t2_recon_spytarget_winch",
+            "desc": "Take a picture of the electronic winch",
+            "type": "Task"
+        },
+        "1987": {
+            "name": "t2_recon_spytarget_wing_left",
+            "desc": "Take a picture of Clockwerk's left wing",
+            "type": "Task"
+        },
+        "1988": {
+            "name": "t2_recon_spytarget_wing_right",
+            "desc": "Take a picture of Clockwerk's right wing",
+            "type": "Task"
+        },
+        "1989": {
+            "name": "t2_recon_spytarget_rajan",
+            "desc": "Take a picture of Rajan",
+            "type": "Task"
+        },
+        "1990": {
+            "name": "t2_recon_tier1_complete",
+            "desc": "Listen to Bentley talk",
+            "type": "Task"
+        },
+        "1991": {
+            "name": "t2_recon_spytarget_bison",
+            "desc": "Take a picture of Jean Bison",
+            "type": "Task"
+        },
+        "1992": {
+            "name": "t2_recon_spytarget_contessa",
+            "desc": "Take a picture of Contessa",
+            "type": "Task"
+        },
+        "1993": {
+            "name": "t2_recon_spytarget_neela",
+            "desc": "Take a picture of Neyla",
+            "type": "Task"
+        },
+        "1994": {
+            "name": "t2_recon_spytarget_carmelita",
+            "desc": "Take a picture of Carmeltita",
+            "type": "Task"
+        },
+        "1995": {
+            "name": "t2_recon_spytarget_arpeggio",
+            "desc": "Take a picture of Arpeggio",
+            "type": "Task"
+        },
+        "1996": {
+            "name": "t2_recon_complete",
+            "desc": "Complete \"Recon the Ballroom\"",
+            "type": "Job Complete"
+        },
+        "1999": {
+            "name": "t2_chalktalk1",
+            "desc": "Chalktalk 1",
+            "type": "Chalktalk"
+        },
+        "2035": {
+            "name": "t2_dance_audition_fake_intro",
+            "desc": "Knock on the palace door for the first time",
+            "type": "Task"
+        },
+        "2130": {
+            "name": "t2_done",
+            "desc": "Complete episode \"A Starry Eyed Encounter\"",
+            "type": "Task"
+        }
+    },
     "3": {
         "2168": {
             "name": "t3_intro",
