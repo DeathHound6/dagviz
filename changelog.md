@@ -9,6 +9,8 @@
 * Added support for Sly 3 July build
 * Changed default node text to address
 * Fixed an issue with incorrect file paths in release builds
+* Add some more task descriptions for Episodes 0 (tutorial), 2, 8
+* Add the ability to save settings
 
 ## v0.5
 * App doesn't crash when PCSX2 or Sly aren't running

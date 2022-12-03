@@ -3,8 +3,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; img-src 'self' data:">
     <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'; img-src 'self' data:">
-    
-    <script src="node_modules\jquery\dist\jquery.min.js" type="text/javascript"></script>
+    <script src="..\..\node_modules\jquery\dist\jquery.min.js" type="text/javascript"></script>
 
     <link rel="stylesheet" type="text/css" href="main.css"/>
     <link rel="icon" type="image/png" href="./img/favicon.png"/>
@@ -15,7 +14,7 @@
     <!-- TITLE BAR -->
     <div id="titlebar">
         <img class="favicon" src="./img/favicon.png"/>
-        <p>DAGviz v0.6.3</p>
+        <p>DAGviz v0.6.5</p>
         <div id="win-controls">
             <img class="win-icon win-min" src="./img/minimize.png"></img>
             <img class="win-icon win-max" src="./img/maximize.png"></img>
@@ -93,6 +92,7 @@
             <p>base address</p>
             <input type="text" name="base-address" id="pref-base-address" placeholder="20000000"/>
         </div>-->
+        <button class="panel-row" type="button" id="save">Save Settings</button>
     </div>
 
     <div id="graph-container">

@@ -64,11 +64,11 @@ ipc.on('no-game', function(event, store) {
 /* Manage GUI */
 // Send current settings values to main.js
 function sendSettings() {
-    var settings = {
+    const settings = {
         'auto-detect-build': $('#pref-autodetect').is(':checked'),
         'build': $('#pref-build').val(),
         'nodes-display': $('#pref-nodes-display').val(),
-        'base-address': $('#pref-base-address').val()
+        //'base-address': $('#pref-base-address').val()
     };
     ipc.send('set-settings', settings);
 }
@@ -78,13 +78,16 @@ ipc.on('world-id', function(event, store) {
     $('#episode-title').text('Episode ' + store);
 });
 
+ipc.on("get-settings", function(event, settings) {
+    $("#pref-autodetect").attr("checked", settings["auto-detect-build"]);
+    $('#pref-build').val(settings["build"]);
+    $('#pref-build').attr("disabled", $("#pref-autodetect").attr("checked") || $('#pref-build').val() == "none");
+    $('#pref-nodes-display').val(settings["nodes-display"]);
+    //$('#pref-base-address').val(settings["base-address"]);
+});
+
 ipc.on('build', function(event, store) {
-    var $prefBuild = $('#pref-build');
-    if (store == -1) {
-        $prefBuild.val('none');
-    } else {
-        $prefBuild.val(BUILDS[store]);
-    }
+    $('#pref-build').val(store == -1 ? 'none' : BUILDS[store]);
 });
 
 ipc.on('alert', function(event, store) {
@@ -113,6 +116,11 @@ window.addEventListener('DOMContentLoaded', () => {
                 'top': mousePos.y - dragOffset.y
             });
         }
+    });
+
+    $("#save").on("click", function() {
+        sendSettings();
+        alert("Settings saved");
     });
     
     // On Mouse Down event on drag handle
@@ -155,22 +163,20 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     // Send initial settings to main.js
-    sendSettings();
+    //sendSettings();
 
     // Handle changed input/select element
     $('input, select').on('change', function() {
-        var $this = $(this);
+        const $this = $(this);
         if ($this.attr('id') == 'pref-autodetect') {
-            let prefBuild = document.getElementById('pref-build');
-            if ($this.is(':checked')) {
+            const prefBuild = document.getElementById('pref-build');
+            if ($this.is(':checked'))
                 prefBuild.disabled = true
-            } else {
+            else {
                 prefBuild.disabled = false;
                 $(prefBuild).val('none');
             }
         }
-        // Send updated settings to main.js
-        sendSettings();
     });
 
     /* TITLEBAR */
