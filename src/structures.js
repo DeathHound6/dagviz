@@ -54,14 +54,17 @@ class Node {
 
     // get the current state of the task (0, 1, 2, 3)
     /**
-     * @type {0|1|2|3}
+     * @returns {0|1|2|3}
      */
     get state() {
         return Memory.read(this.address + Node.oState[GAME()], UINT32);
     }
+    /**
+     * @returns {"UNAVAILABLE"|"AVAILABLE"|"COMPLETE"|"FINAL"}
+     */
     get stateName() {
         const stateName = Object.entries(States).find((k,v) => v == this.state)[0];
-        return stateName.toLowerCase().replace(stateName.charAt(0), stateName.charAt(0).toUpperCase());
+        return stateName.toLowerCase().replace(stateName[0], stateName[0].toUpperCase());
     }
 
     set state(val) {
@@ -156,7 +159,7 @@ class Node {
         else if (settings().nodesDisplay == 'address')
             label = `0x${this.address.toString(16)}`;
         else if (settings().nodesDisplay == 'state')
-            label = this.state;
+            label = this.stateName;
         else
             label = this.id;
 
