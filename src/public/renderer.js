@@ -1,6 +1,6 @@
-var ipc = require('electron').ipcRenderer;
-var d3 = require('d3-graphviz');
-var save = require('save-svg-as-png');
+const ipc = require('electron').ipcRenderer;
+const d3 = require('d3-graphviz');
+const save = require('save-svg-as-png');
 window.$ = window.jQuery = require('jquery');
 
 const BUILDS = ['sly2ntsc', 'sly3ntsc', 'sly2mar', 'sly3aug', 'sly3sep', 'sly3jul'];
@@ -8,12 +8,16 @@ const BUILDS = ['sly2ntsc', 'sly3ntsc', 'sly2mar', 'sly3aug', 'sly3sep', 'sly3ju
 /* Manage graph */
 
 // Init graph attributes
-var margin = 2;
-var width = window.innerWidth - margin;
-var height = window.innerHeight - margin;
+const margin = 2;
+let width = window.innerWidth - margin;
+let height = window.innerHeight - margin;
+
+// Set up vars to store dot text for graph
+let lastDot = '';
+let dot = '';
 
 // Create graphviz renderer with transitions
-var graphviz = d3.graphviz('#graph')
+const graphviz = d3.graphviz('#graph')
     .on("initEnd", render)
     .on("renderEnd", () => {
         document.body.style.cursor = '';
@@ -35,15 +39,10 @@ window.onresize = function() {
 // Render dot graph
 function render() {
     lastDot = dot;
-    graphviz
-        .width(width)
+    graphviz.width(width)
         .height(height)
         .renderDot(dot);
 }
-
-// Set up vars to store dot text for graph
-var lastDot = '';
-var dot = '';
 
 // Handle receiving dot text from main.js
 ipc.on('dot-text', function(event, store) {
@@ -163,7 +162,7 @@ window.addEventListener('DOMContentLoaded', () => {
     });
 
     // Send initial settings to main.js
-    //sendSettings();
+    sendSettings();
 
     // Handle changed input/select element
     $('input, select').on('change', function() {
@@ -177,6 +176,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 $(prefBuild).val('none');
             }
         }
+        sendSettings();
     });
 
     /* TITLEBAR */

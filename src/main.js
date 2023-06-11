@@ -15,23 +15,33 @@ let processObject = undefined;
 let worldId = 0;
 
 // Application Variables
-const appSettings = JSON.parse(existsSync(`${__dirname}/config.json`) ? readFileSync(`${__dirname}/config.json`).toString(): '{}');
+const appSettings = JSON.parse(existsSync(`${__dirname}/config.json`) ? readFileSync(`${__dirname}/config.json`).toString() : '{}');
 let autoDetectBuild = appSettings["auto-detect-build"] || true;
 let nodesDisplay = appSettings["nodes-display"] || 'name';
 
 module.exports = {
-    GAME: function() { return GAME; },
-    BUILD: function() { return BUILD; },
-    processObject: function() { return processObject; },
-    worldId: function() { return worldId; },
+    GAME() {
+        return GAME;
+    },
+    BUILD() {
+        return BUILD;
+    },
+    processObject() {
+        return processObject;
+    },
+    worldId() {
+        return worldId;
+    },
     memoryBase,
-    settings: function() {
+    settings() {
         return {
             autoDetectBuild,
             nodesDisplay
         };
     },
-    tasks: function() { return tasks; }
+    tasks() {
+        return tasks;
+    }
 }
 
 // define requires to local files later to prevent circular imports
@@ -51,46 +61,49 @@ function reattach() {
         processObject = memoryjs.openProcess('pcsx2.exe');
         //console.log("Connected to PCSX2");
     } catch(err) {
-        //console.log("PCSX2 not detected. Make sure PCSX2 is open.");
         processObject = undefined;
         return;
     }
 }
 
 function detectGame() {
+    if (!processObject) {
+        console.log("PCSX2 Not detected");
+        GAME = BUILD = -1;
+        return;
+    }
+
     if (Memory.read(0x92CE0, memoryjs.UINT32) != 1) {
-        //console.log("No game detected. Make sure the game is running.");
-        BUILD = -1;
+        console.log("No game detected. Make sure the game is running.");
+        GAME = BUILD = -1;
         return;
     }
 
     // detect which game is running and set BUILD
     var buildString = '';
-    // /console.log(readMemory(0x15395, memoryjs.STRING));
-    // readMemory(0x15b90, memoryjs.STRING)
     // Sly 2 - Retail
-    if (buildString = Memory.read(0x15395, memoryjs.STRING), buildString.indexOf('973.16') > -1) {
+    if (buildString = Memory.read(0x15390, memoryjs.STRING), buildString.indexOf('SCUS_973.16') > -1) {
         GAME = 0;
         BUILD = BUILDS.sly2ntsc;
     }
     // Sly 3 - July
-    else if (buildString = Memory.read(0x33e838, memoryjs.STRING), buildString.indexOf('0716.1854') > -1) {
-        GAME = 1;
-        BUILD = BUILDS.sly3jul;
-    }
+    // else if (buildString = Memory.read(0x33e838, memoryjs.STRING), buildString.indexOf('0716.1854') > -1) {
+    //     GAME = 1;
+    //     BUILD = BUILDS.sly3jul;
+    // }
     // Sly 3 - Retail
-    else if (buildString = Memory.read(0x15390, memoryjs.STRING), buildString.indexOf('974.64') > -1) {
-        GAME = 1;
-        BUILD = BUILDS.sly3ntsc;
-    }
+    // else if (buildString = Memory.read(0x15390, memoryjs.STRING), buildString.indexOf('974.64') > -1) {
+    //     GAME = 1;
+    //     BUILD = BUILDS.sly3ntsc;
+    // }
     // Sly 2 - March Proto
-    else if (buildString = Memory.read(0x15b90, memoryjs.STRING), buildString.indexOf('971.98') > -1) {
-        GAME = 0;
-        BUILD = BUILDS.sly2mar;
-    } else { // Invalid/Unsupported build
-        console.log("Invalid game detected (" + buildString + "). Make sure Sly 2 or 3 (NTSC) is running. (");
-        GAME = BUILD = -1;
-    }
+    // else if (buildString = Memory.read(0x15b90, memoryjs.STRING), buildString.indexOf('971.98') > -1) {
+    //     GAME = 0;
+    //     BUILD = BUILDS.sly2mar;
+    // } else { // Invalid/Unsupported build
+    //     console.log("Invalid game detected (" + buildString + "). Make sure Sly 2 or 3 (NTSC) is running. (");
+    //     GAME = BUILD = -1;
+    // }
 }
 
 // Handle events from renderer.js
@@ -222,7 +235,7 @@ app.whenReady().then(() => {
                 isLoading = false;
 
             // if the dag head is out of date, wait until 0.4 sec after level load to repopulate
-            if ((rootNode != dag.head) && !(isLoading)) {
+            if (rootNode != dag.head && !isLoading) {
                 setTimeout(() => {
                     dag.populateGraph(rootNode);
                 }, 400);
